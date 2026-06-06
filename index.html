@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Thiru Apps — a collection of web applications and online services." />
+  <title>Thiru Apps</title>
+
+  <!-- React (no build step required) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg-1: #0f2027;
+      --bg-2: #203a43;
+      --bg-3: #2c5364;
+      --accent: #38bdf8;
+      --accent-2: #818cf8;
+      --text: #f1f5f9;
+      --muted: #cbd5e1;
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 255, 255, 0.18);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      /*
+        Drop your own image at assets/background.jpg and it will be used automatically.
+        The gradient below shows through / acts as fallback if the image is missing.
+      */
+      /* Plain gradient = true fallback, shown if the image fails to load */
+      background: linear-gradient(135deg, var(--bg-1), var(--bg-2), var(--bg-3));
+    }
+
+    /* Background image + dark overlay layer (sits above the fallback gradient,
+       behind all page content). Drop your image at assets/background.jpg. */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(rgba(10, 20, 30, 0.72), rgba(10, 20, 30, 0.82)),
+        url("assets/background.jpg") center / cover no-repeat fixed;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ---------- Header / Nav ---------- */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      background: rgba(15, 32, 39, 0.55);
+      border-bottom: 1px solid var(--card-border);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+    .brand .logo {
+      width: 36px; height: 36px;
+      display: grid; place-items: center;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      font-weight: 800;
+      color: #0b1220;
+    }
+    .nav-links { display: flex; gap: 6px; }
+    .nav-links button {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 0.95rem;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .nav-links button:hover { color: var(--text); background: rgba(255,255,255,0.08); }
+    .nav-links button.active { color: var(--text); background: rgba(56,189,248,0.18); }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      text-align: center;
+      padding: 70px 0 40px;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      line-height: 1.1;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff, var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ---------- App tiles ---------- */
+    .section-title {
+      font-size: 1.4rem;
+      margin: 30px 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--card-border);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+      padding-bottom: 60px;
+    }
+    .tile {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 22px;
+      border-radius: 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .tile:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+      border-color: var(--accent);
+    }
+    .tile .icon {
+      width: 54px; height: 54px;
+      border-radius: 14px;
+      display: grid; place-items: center;
+      font-size: 1.7rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #0b1220;
+    }
+    .tile h3 { font-size: 1.15rem; }
+    .tile p { color: var(--muted); font-size: 0.9rem; line-height: 1.45; flex: 1; }
+    .tile .url {
+      font-size: 0.82rem;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      word-break: break-all;
+    }
+
+    /* ---------- Content pages (About / Contact) ---------- */
+    .page {
+      padding: 50px 0 70px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .page h1 { font-size: 2.2rem; margin-bottom: 20px; }
+    .page h2 { font-size: 1.3rem; margin: 28px 0 12px; }
+    .page p { color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-top: 20px;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .contact-item:last-child { border-bottom: none; }
+    .contact-item .ci-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: grid; place-items: center;
+      font-size: 1.2rem;
+      background: rgba(56,189,248,0.18);
+    }
+    .contact-item a { color: var(--accent); }
+
+    form { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
+    form label { font-size: 0.9rem; color: var(--muted); margin-bottom: 6px; display: block; }
+    form input, form textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: rgba(0,0,0,0.25);
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    form input:focus, form textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+    .btn {
+      align-self: flex-start;
+      padding: 12px 26px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #0b1220;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      transition: transform 0.15s ease;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .form-note { color: var(--accent); font-size: 0.9rem; }
+
+    /* ---------- Footer ---------- */
+    footer {
+      border-top: 1px solid var(--card-border);
+      background: rgba(15, 32, 39, 0.55);
+      backdrop-filter: blur(10px);
+    }
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .footer-links { display: flex; gap: 18px; }
+    .footer-links button {
+      background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.9rem;
+    }
+    .footer-links button:hover { color: var(--accent); }
+
+    @media (max-width: 520px) {
+      .nav-links button { padding: 8px 9px; font-size: 0.85rem; }
+      .brand span.full { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    // ---- App catalog --------------------------------------------------
+    const APPS = [
+      {
+        name: "Online Shopping",
+        url: "https://www.hyderabadonlineshopping.com/",
+        icon: "🛒",
+        desc: "A streamlined shopping experience for everyday needs.",
+      },
+      {
+        name: "Market Monitor",
+        url: "https://marketmonitor.thiruapps.com",
+        icon: "📈",
+        desc: "Track markets, prices and trends in real time.",
+      },
+      {
+        name: "AI Interviewer",
+        url: "https://aiinterviewer.thiruapps.com",
+        icon: "🎤",
+        desc: "AI-powered mock interviews and candidate screening.",
+      },
+      {
+        name: "Resume Extract",
+        url: "https://cvextract.thiruapps.com",
+        icon: "📄",
+        desc: "Extract and parse structured data from resumes and CVs.",
+      },
+      {
+        name: "AI Services",
+        url: "https://aiservices.thiruapps.com",
+        icon: "🤖",
+        desc: "Smart AI-powered tools and automation services.",
+      },
+      {
+        name: "Astro",
+        url: "https://astro.thiruapps.com",
+        icon: "🔮",
+        desc: "Astrology insights, charts and predictions.",
+      },
+      {
+        name: "Demo",
+        url: "https://demo.thiruapps.com",
+        icon: "🧪",
+        desc: "Live demos and previews of upcoming products.",
+      },
+      {
+        name: "POC",
+        url: "https://poc.thiruapps.com",
+        icon: "💡",
+        desc: "Proof-of-concept experiments and prototypes.",
+      },
+    ];
+
+    // ---- Components ---------------------------------------------------
+    function Nav({ page, setPage }) {
+      const link = (id, label) => (
+        <button
+          className={page === id ? "active" : ""}
+          onClick={() => setPage(id)}
+        >
+          {label}
+        </button>
+      );
+      return (
+        <header>
+          <div className="container nav">
+            <div className="brand" onClick={() => setPage("home")}>
+              <span className="logo">T</span>
+              <span>Thiru <span className="full">Apps</span></span>
+            </div>
+            <nav className="nav-links">
+              {link("home", "Home")}
+              {link("about", "About Us")}
+              {link("contact", "Contact Us")}
+            </nav>
+          </div>
+        </header>
+      );
+    }
+
+    function Tile({ app }) {
+      return (
+        <a className="tile" href={app.url} target="_blank" rel="noopener noreferrer">
+          <div className="icon">{app.icon}</div>
+          <h3>{app.name}</h3>
+          <p>{app.desc}</p>
+          <span className="url">↗ {app.url.replace(/^https?:\/\//, "")}</span>
+        </a>
+      );
+    }
+
+    function Home() {
+      return (
+        <main className="container">
+          <section className="hero">
+            <h1>Welcome to Thiru Apps</h1>
+            <p>
+              A growing collection of web applications and online services.
+              Pick a tile below to launch any app.
+            </p>
+          </section>
+          <h2 className="section-title">Our Apps</h2>
+          <section className="grid">
+            {APPS.map((app) => <Tile key={app.url} app={app} />)}
+          </section>
+        </main>
+      );
+    }
+
+    function About() {
+      return (
+        <main className="container page">
+          <h1>About Us</h1>
+          <p>
+            Thiru Apps is a portfolio of web applications and online services built
+            to make everyday tasks simpler — from online shopping and market tracking
+            to AI-powered tools and astrology.
+          </p>
+          <p>
+            Each app under the Thiru Apps umbrella is designed with a focus on
+            usability, speed and reliability. Our mission is to bring useful,
+            accessible technology to people in Hyderabad and beyond.
+          </p>
+          <div className="card">
+            <h2>What we do</h2>
+            <p>🛍️ E-commerce and online shopping platforms</p>
+            <p>📈 Market monitoring and data tools</p>
+            <p>🤖 AI services and automation</p>
+            <p>🔮 Astrology and lifestyle applications</p>
+            <p>🧪 Demos and proof-of-concept innovations</p>
+          </div>
+        </main>
+      );
+    }
+
+    function Contact() {
+      const [sent, setSent] = useState(false);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        setSent(true);
+      };
+
+      return (
+        <main className="container page">
+          <h1>Contact Us</h1>
+          <p>Have a question or want to work with us? Reach out anytime.</p>
+
+          <div className="card">
+            <div className="contact-item">
+              <div className="ci-icon">✉️</div>
+              <div>
+                <div>Email</div>
+                <a href="mailto:contact@thiruapps.com">contact@thiruapps.com</a>
+              </div>
+            </div>
+            <div className="contact-item">
+              <div className="ci-icon">🌐</div>
+              <div>
+                <div>Website</div>
+                <a href="https://thiruapps.com" target="_blank" rel="noopener noreferrer">thiruapps.com</a>
+              </div>
+            </div>
+            <div className="contact-item">
+              <div className="ci-icon">📍</div>
+              <div>
+                <div>Location</div>
+                <span style={{ color: "var(--muted)" }}>Hyderabad, India</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <h2>Send us a message</h2>
+            {sent ? (
+              <p className="form-note">✅ Thanks! Your message has been recorded. We'll get back to you soon.</p>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <div>
+                  <label>Name</label>
+                  <input type="text" required placeholder="Your name" />
+                </div>
+                <div>
+                  <label>Email</label>
+                  <input type="email" required placeholder="you@example.com" />
+                </div>
+                <div>
+                  <label>Message</label>
+                  <textarea rows="4" required placeholder="How can we help?"></textarea>
+                </div>
+                <button className="btn" type="submit">Send Message</button>
+              </form>
+            )}
+          </div>
+        </main>
+      );
+    }
+
+    function Footer({ setPage }) {
+      return (
+        <footer>
+          <div className="container footer-inner">
+            <span>© {new Date().getFullYear()} Thiru Apps. All rights reserved.</span>
+            <div className="footer-links">
+              <button onClick={() => setPage("home")}>Home</button>
+              <button onClick={() => setPage("about")}>About Us</button>
+              <button onClick={() => setPage("contact")}>Contact Us</button>
+            </div>
+          </div>
+        </footer>
+      );
+    }
+
+    function App() {
+      const [page, setPage] = useState("home");
+      return (
+        <React.Fragment>
+          <Nav page={page} setPage={setPage} />
+          {page === "home" && <Home />}
+          {page === "about" && <About />}
+          {page === "contact" && <Contact />}
+          <Footer setPage={setPage} />
+        </React.Fragment>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
