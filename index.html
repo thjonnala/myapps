@@ -84,12 +84,16 @@
       cursor: pointer;
     }
     .brand .logo {
-      width: 36px; height: 36px;
-      display: grid; place-items: center;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      font-weight: 800;
-      color: #0b1220;
+      width: 38px; height: 38px;
+      border-radius: 11px;
+      /* Photo cropped/zoomed to the face so it fits naturally in the rounded icon */
+      background-image: url("assets/profile.jpg");
+      background-size: 185%;
+      background-position: 50% 16%;
+      background-repeat: no-repeat;
+      /* subtle themed ring to match the original logo frame */
+      box-shadow: inset 0 0 0 2px rgba(129, 140, 248, 0.55),
+                  0 2px 6px rgba(0, 0, 0, 0.35);
     }
     .nav-links { display: flex; gap: 6px; }
     .nav-links button {
@@ -344,7 +348,7 @@
         <header>
           <div className="container nav">
             <div className="brand" onClick={() => setPage("home")}>
-              <span className="logo">T</span>
+              <span className="logo" role="img" aria-label="Thiru"></span>
               <span>Thiru <span className="full">Apps</span></span>
             </div>
             <nav className="nav-links">
